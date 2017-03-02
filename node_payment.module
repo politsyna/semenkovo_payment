@@ -1,0 +1,37 @@
+<?php
+
+/**
+ * @file
+ * Module.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\node\Entity\Node;
+
+/**
+ * Node_payment_form_alter.
+ */
+function node_payment_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if ($form_id == 'node_payment_form') {
+    $order_nid = \Drupal::request()->get('orders');
+    if ($order_nid && is_numeric($order_nid)) {
+      $order_node = Node::load($order_nid);
+      if ($order_node && $order_node->getType() == 'orders') {
+        $must = $order_node->field_orders_cost->value;
+        $form['field_payment_ref_orders']['widget'][0]['target_id']['#default_value'] = $order_node;
+        $form['field_payment_summa']['widget'][0]['value']['#title'] = "Сумма платежа (должно быть - " . round($must) . " руб.)";
+      }
+    }
+  }
+}
+
+/**
+ * Node_payment_entity_presave.
+ */
+function node_payment_entity_presave(EntityInterface $entity) {
+  if (method_exists($entity, 'getType') && $entity->getType() == 'payment') {
+    $title = 'Оплата от ' . format_date(time(), 'long');
+    $entity->title->setValue($title);
+  }
+}
