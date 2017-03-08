@@ -18,7 +18,7 @@ function node_payment_form_alter(&$form, FormStateInterface $form_state, $form_i
     if ($order_nid && is_numeric($order_nid)) {
       $order_node = Node::load($order_nid);
       if ($order_node && $order_node->getType() == 'orders') {
-        $must = $order_node->field_orders_cost->value;
+        $must = $order_node->field_orders_cost_raschet->value;
         $form['field_payment_ref_orders']['widget'][0]['target_id']['#default_value'] = $order_node;
         $form['field_payment_summa']['widget'][0]['value']['#title'] = "Сумма платежа (должно быть - " . round($must) . " руб.)";
       }
